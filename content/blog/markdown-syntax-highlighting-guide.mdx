@@ -1,0 +1,159 @@
+---
+title: "A Guide to Markdown Rendering and Syntax Highlighting"
+description: "Learn how to leverage markdown rendering with syntax highlighting and a table of contents in your Next.js blog posts."
+image: /images/blog/blog-post-1.jpg
+date: "2023-04-15"
+authors:
+  - shadcn
+---
+
+Writing blog posts in MDX gives you the full power of markdown combined with React components. In this post, we'll explore how syntax highlighting, table of contents, and rich markdown rendering come together to create a great reading experience.
+
+## Getting Started with MDX
+
+MDX is a format that lets you seamlessly write JSX in your markdown documents. You can import components, such as interactive charts or alerts, and embed them within your content.
+
+Here's a simple example of a React component:
+
+```tsx title="components/hello.tsx"
+export function Hello({ name }: { name: string }) {
+  return <h1>Hello, {name}!</h1>
+}
+```
+
+The component above renders a greeting. You can use it directly in your MDX files.
+
+## Syntax Highlighting in Action
+
+One of the most important features for a developer blog is proper syntax highlighting. Let's look at a few examples across different languages.
+
+### TypeScript
+
+```typescript
+interface User {
+  id: string
+  name: string
+  email: string
+  createdAt: Date
+}
+
+async function getUser(id: string): Promise<User | null> {
+  const response = await fetch(`/api/users/${id}`)
+
+  if (!response.ok) {
+    return null
+  }
+
+  return response.json()
+}
+```
+
+### Python
+
+```python
+from dataclasses import dataclass
+from typing import Optional
+
+@dataclass
+class BlogPost:
+    title: str
+    slug: str
+    content: str
+    published: bool = False
+
+    def publish(self) -> None:
+        self.published = True
+        print(f"Published: {self.title}")
+
+def get_posts(limit: Optional[int] = None) -> list[BlogPost]:
+    posts = load_all_posts()
+    return posts[:limit] if limit else posts
+```
+
+### CSS
+
+```css
+.prose pre {
+  @apply rounded-lg border bg-black p-4;
+  overflow-x: auto;
+}
+
+.prose code {
+  @apply relative rounded border px-[0.3rem] py-[0.2rem] font-mono text-sm;
+}
+
+.prose :where(code):not(:where([class~="not-prose"] *))::before,
+.prose :where(code):not(:where([class~="not-prose"] *))::after {
+  content: none;
+}
+```
+
+## Using the Table of Contents
+
+A table of contents improves navigation for longer articles. It automatically generates links from the headings in your post, allowing readers to jump to specific sections.
+
+The table of contents on this page is generated from the `## ` and `### ` headings in this MDX file.
+
+### How It Works
+
+The TOC is built using `mdast-util-toc` and `remark`. Here's a simplified version:
+
+```typescript
+import { toc } from "mdast-util-toc"
+import { remark } from "remark"
+
+export async function getTableOfContents(content: string) {
+  const result = await remark()
+    .use(() => (node, file) => {
+      const table = toc(node)
+      file.data = extractItems(table.map)
+    })
+    .process(content)
+
+  return result.data
+}
+```
+
+### Active Heading Tracking
+
+The TOC component uses an `IntersectionObserver` to track which section the reader is currently viewing, highlighting the corresponding item in the sidebar.
+
+## Rich Markdown Features
+
+### Block Quotes
+
+> The best way to predict the future is to invent it.
+> — Alan Kay
+
+### Lists
+
+Here are some benefits of using MDX for your blog:
+
+1. **Component embedding** — Use React components directly in your posts
+2. **Syntax highlighting** — Beautiful code blocks with language-specific coloring
+3. **Table of contents** — Auto-generated navigation from headings
+4. **Type safety** — Full TypeScript support in your content
+
+### Tables
+
+| Feature             | Status      | Notes                  |
+| ------------------- | ----------- | ---------------------- |
+| Markdown rendering  | ✅ Complete | Via MDX + Contentlayer |
+| Syntax highlighting | ✅ Complete | Via rehype-pretty-code |
+| Table of contents   | ✅ Complete | Via mdast-util-toc     |
+| Dark mode           | ✅ Complete | Via next-themes        |
+
+### Inline Code
+
+You can use inline code like `const x = 42` or reference files like `contentlayer.config.js` within your paragraphs.
+
+## Conclusion
+
+With MDX, Contentlayer, and the right rehype/remark plugins, you get a powerful blogging setup that includes:
+
+- Beautiful syntax highlighting with theme support
+- An auto-generated, scrollable table of contents
+- Full markdown rendering with custom styled components
+- Support for embedding interactive React components
+
+This is the stack that powers this blog, and it's all open source.
